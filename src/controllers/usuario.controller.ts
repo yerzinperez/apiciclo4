@@ -1,29 +1,34 @@
+import {service} from '@loopback/core';
 import {
   Count,
   CountSchema,
   Filter,
   FilterExcludingWhere,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  param,
   patch,
+  post,
   put,
-  del,
   requestBody,
-  response,
+  response
 } from '@loopback/rest';
+import axios from 'axios';
 import {Usuario} from '../models';
 import {UsuarioRepository} from '../repositories';
+import {AuthService} from '../services';
 
 export class UsuarioController {
   constructor(
     @repository(UsuarioRepository)
-    public usuarioRepository : UsuarioRepository,
+    public usuarioRepository: UsuarioRepository,
+    @service(AuthService)
+    public servicioAuth: AuthService,
   ) {}
 
   @post('/usuarios')
@@ -44,7 +49,42 @@ export class UsuarioController {
     })
     usuario: Omit<Usuario, 'id'>,
   ): Promise<Usuario> {
-    return this.usuarioRepository.create(usuario);
+    // return this.usuarioRepository.create(usuario);
+    //Nuevo
+    let clave = this.servicioAuth.GenerarClave();
+    let claveCifrada = this.servicioAuth.CifrarClave(clave);
+    usuario.contrasenia = claveCifrada;
+    let p = await this.usuarioRepository.create(usuario);
+
+    // Notificamos al usuario por correo
+    let destino = usuario.correo;
+    // Notifiamos al usuario por telefono y cambiar la url por send_sms
+    // let destino = usuario.telefono;
+
+    let asunto = 'Registro de usuario en plataforma';
+    let contenido = `Hola, ${usuario.nombre} ${usuario.apellidos} su contraseña en el portal es: ${clave}`;
+    axios({
+      method: 'post',
+      url: 'http://localhost:5000/send_email', //Si quiero enviar por mensaje cambiar a send_sms
+
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      data: {
+        destino: destino,
+        asunto: asunto,
+        contenido: contenido,
+      },
+    })
+      .then((data: any) => {
+        console.log(data);
+      })
+      .catch((err: any) => {
+        console.log(err);
+      });
+
+    return p;
   }
 
   @get('/usuarios/count')
@@ -52,9 +92,7 @@ export class UsuarioController {
     description: 'Usuario model count',
     content: {'application/json': {schema: CountSchema}},
   })
-  async count(
-    @param.where(Usuario) where?: Where<Usuario>,
-  ): Promise<Count> {
+  async count(@param.where(Usuario) where?: Where<Usuario>): Promise<Count> {
     return this.usuarioRepository.count(where);
   }
 
@@ -106,7 +144,8 @@ export class UsuarioController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Usuario, {exclude: 'where'}) filter?: FilterExcludingWhere<Usuario>
+    @param.filter(Usuario, {exclude: 'where'})
+    filter?: FilterExcludingWhere<Usuario>,
   ): Promise<Usuario> {
     return this.usuarioRepository.findById(id, filter);
   }
