@@ -7,13 +7,13 @@ import {
   Where,
 } from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  param,
   patch,
+  post,
   put,
-  del,
   requestBody,
   response,
 } from '@loopback/rest';
@@ -23,10 +23,10 @@ import {EstacionRepository} from '../repositories';
 export class EstacionController {
   constructor(
     @repository(EstacionRepository)
-    public estacionRepository : EstacionRepository,
+    public estacionRepository: EstacionRepository,
   ) {}
 
-  @post('/estacions')
+  @post('/estaciones')
   @response(200, {
     description: 'Estacion model instance',
     content: {'application/json': {schema: getModelSchemaRef(Estacion)}},
@@ -47,18 +47,16 @@ export class EstacionController {
     return this.estacionRepository.create(estacion);
   }
 
-  @get('/estacions/count')
+  @get('/estaciones/count')
   @response(200, {
     description: 'Estacion model count',
     content: {'application/json': {schema: CountSchema}},
   })
-  async count(
-    @param.where(Estacion) where?: Where<Estacion>,
-  ): Promise<Count> {
+  async count(@param.where(Estacion) where?: Where<Estacion>): Promise<Count> {
     return this.estacionRepository.count(where);
   }
 
-  @get('/estacions')
+  @get('/estaciones')
   @response(200, {
     description: 'Array of Estacion model instances',
     content: {
@@ -76,7 +74,7 @@ export class EstacionController {
     return this.estacionRepository.find(filter);
   }
 
-  @patch('/estacions')
+  @patch('/estaciones')
   @response(200, {
     description: 'Estacion PATCH success count',
     content: {'application/json': {schema: CountSchema}},
@@ -95,7 +93,7 @@ export class EstacionController {
     return this.estacionRepository.updateAll(estacion, where);
   }
 
-  @get('/estacions/{id}')
+  @get('/estaciones/{id}')
   @response(200, {
     description: 'Estacion model instance',
     content: {
@@ -106,12 +104,13 @@ export class EstacionController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Estacion, {exclude: 'where'}) filter?: FilterExcludingWhere<Estacion>
+    @param.filter(Estacion, {exclude: 'where'})
+    filter?: FilterExcludingWhere<Estacion>,
   ): Promise<Estacion> {
     return this.estacionRepository.findById(id, filter);
   }
 
-  @patch('/estacions/{id}')
+  @patch('/estaciones/{id}')
   @response(204, {
     description: 'Estacion PATCH success',
   })
@@ -129,7 +128,7 @@ export class EstacionController {
     await this.estacionRepository.updateById(id, estacion);
   }
 
-  @put('/estacions/{id}')
+  @put('/estaciones/{id}')
   @response(204, {
     description: 'Estacion PUT success',
   })
@@ -140,7 +139,7 @@ export class EstacionController {
     await this.estacionRepository.replaceById(id, estacion);
   }
 
-  @del('/estacions/{id}')
+  @del('/estaciones/{id}')
   @response(204, {
     description: 'Estacion DELETE success',
   })
