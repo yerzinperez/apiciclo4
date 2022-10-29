@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {
   Count,
   CountSchema,
@@ -7,23 +8,23 @@ import {
   Where,
 } from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  param,
   patch,
+  post,
   put,
-  del,
   requestBody,
   response,
 } from '@loopback/rest';
 import {Ruta} from '../models';
 import {RutaRepository} from '../repositories';
-
+@authenticate('admin')
 export class RutaController {
   constructor(
     @repository(RutaRepository)
-    public rutaRepository : RutaRepository,
+    public rutaRepository: RutaRepository,
   ) {}
 
   @post('/rutas')
@@ -52,9 +53,7 @@ export class RutaController {
     description: 'Ruta model count',
     content: {'application/json': {schema: CountSchema}},
   })
-  async count(
-    @param.where(Ruta) where?: Where<Ruta>,
-  ): Promise<Count> {
+  async count(@param.where(Ruta) where?: Where<Ruta>): Promise<Count> {
     return this.rutaRepository.count(where);
   }
 
@@ -70,9 +69,7 @@ export class RutaController {
       },
     },
   })
-  async find(
-    @param.filter(Ruta) filter?: Filter<Ruta>,
-  ): Promise<Ruta[]> {
+  async find(@param.filter(Ruta) filter?: Filter<Ruta>): Promise<Ruta[]> {
     return this.rutaRepository.find(filter);
   }
 
@@ -106,7 +103,7 @@ export class RutaController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Ruta, {exclude: 'where'}) filter?: FilterExcludingWhere<Ruta>
+    @param.filter(Ruta, {exclude: 'where'}) filter?: FilterExcludingWhere<Ruta>,
   ): Promise<Ruta> {
     return this.rutaRepository.findById(id, filter);
   }

@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {
   Count,
   CountSchema,
@@ -7,23 +8,24 @@ import {
   Where,
 } from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  param,
   patch,
+  post,
   put,
-  del,
   requestBody,
   response,
 } from '@loopback/rest';
 import {Servicio} from '../models';
 import {ServicioRepository} from '../repositories';
 
+@authenticate('admin')
 export class ServicioController {
   constructor(
     @repository(ServicioRepository)
-    public servicioRepository : ServicioRepository,
+    public servicioRepository: ServicioRepository,
   ) {}
 
   @post('/servicios')
@@ -52,9 +54,7 @@ export class ServicioController {
     description: 'Servicio model count',
     content: {'application/json': {schema: CountSchema}},
   })
-  async count(
-    @param.where(Servicio) where?: Where<Servicio>,
-  ): Promise<Count> {
+  async count(@param.where(Servicio) where?: Where<Servicio>): Promise<Count> {
     return this.servicioRepository.count(where);
   }
 
@@ -106,7 +106,8 @@ export class ServicioController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Servicio, {exclude: 'where'}) filter?: FilterExcludingWhere<Servicio>
+    @param.filter(Servicio, {exclude: 'where'})
+    filter?: FilterExcludingWhere<Servicio>,
   ): Promise<Servicio> {
     return this.servicioRepository.findById(id, filter);
   }

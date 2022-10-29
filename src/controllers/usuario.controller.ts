@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {service} from '@loopback/core';
 import {
   Count,
@@ -5,7 +6,7 @@ import {
   Filter,
   FilterExcludingWhere,
   repository,
-  Where
+  Where,
 } from '@loopback/repository';
 import {
   del,
@@ -24,6 +25,7 @@ import {Credenciales, Usuario} from '../models';
 import {UsuarioRepository} from '../repositories';
 import {AuthService} from '../services';
 
+@authenticate('admin')
 export class UsuarioController {
   constructor(
     @repository(UsuarioRepository)
@@ -32,6 +34,7 @@ export class UsuarioController {
     public servicioAuth: AuthService,
   ) {}
 
+  @authenticate.skip()
   @post('/usuarios')
   @response(200, {
     description: 'Usuario model instance',
@@ -50,7 +53,6 @@ export class UsuarioController {
     })
     usuario: Omit<Usuario, 'id'>,
   ): Promise<Usuario> {
-    // return this.usuarioRepository.create(usuario);
     //Nuevo
     let clave = this.servicioAuth.GenerarClave();
     let claveCifrada = this.servicioAuth.CifrarClave(clave);
@@ -189,6 +191,7 @@ export class UsuarioController {
   }
 
   //Servicio de login
+  @authenticate.skip()
   @post('/login', {
     responses: {
       '200': {
