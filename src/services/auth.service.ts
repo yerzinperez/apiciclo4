@@ -3,7 +3,6 @@ import {repository} from '@loopback/repository';
 import {config} from '../config/config';
 import {Usuario} from '../models';
 import {UsuarioRepository} from '../repositories';
-// Nuevas librerias
 const generator = require('password-generator');
 const cryptoJS = require('crypto-js');
 const jwt = require('jsonwebtoken');
@@ -49,10 +48,6 @@ export class AuthService {
       return false;
     }
   }
-
-  /*
-   * Add service methods here
-   */
 
   //Autenticacion
   IdentificarPersona(correo: string, contrasenia: string) {
